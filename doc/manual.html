@@ -1,0 +1,341 @@
+	
+
+<!DOCTYPE html>
+<!-- Template by quackit.com -->
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>LuaNoSQL</title>
+		<style type="text/css">
+		
+			body{
+				margin:0;
+				padding:0;
+				font-family: Sans-Serif;
+				line-height: 1.5em;
+			}
+			
+			main {
+				padding-bottom: 10010px;
+				margin-bottom: -10000px;
+				float: left;
+				width: 100%;
+			}
+			
+			#nav {
+				float: left;
+				width: 230px;
+				margin-left: -100%;
+				padding-bottom: 10010px;
+				margin-bottom: -10000px;
+				background: #eee;
+			}
+			
+			#wrapper {
+				overflow: hidden;
+			}
+			
+			#content {
+				margin-left: 230px; /* Same as 'nav' width */
+			}
+			
+			.innertube{
+				margin: 15px; /* Padding for content */
+				margin-top: 0;
+			}
+			
+			p {
+				color: #555;
+			}
+	
+			nav ul {
+				list-style-type: none;
+				margin: 0;
+				padding: 0;
+			}
+			
+			nav ul a {
+				color: darkgreen;
+				text-decoration: none;
+			}
+	
+		</style>
+		
+		<script type="text/javascript">
+			/* =============================
+			This script generates sample text for the body content. 
+			You can remove this script and any reference to it. 
+			 ============================= */
+			var bodyText=["The smaller your reality, the more convinced you are that you know everything.", "If the facts don't fit the theory, change the facts.", "The past has no power over the present moment.", "This, too, will pass.", "</p><p>You will not be punished for your anger, you will be punished by your anger.", "Peace comes from within. Do not seek it without.", "<h3>Heading</h3><p>The most important moment of your life is now. The most important person in your life is the one you are with now, and the most important activity in your life is the one you are involved with now."]
+			function generateText(sentenceCount){
+				for (var i=0; i<sentenceCount; i++)
+				document.write(bodyText[Math.floor(Math.random()*7)]+" ")
+			}
+		</script>	
+	
+	</head>
+	
+	<body>
+		<div id="wrapper">
+		
+			<main>
+				<div id="content">
+					<div class="innertube">
+						<h1>LuaNoSQL - Lua NoSQL database connectivity</h1>
+						<div name="introduction">
+							<h2>Introduction</h2>
+							<p>LuaNoSQL is a simple interface from Lua to NoSQL database management systems.
+								It includes different drivers for different NoSQL DBMS  (currently UnQLite, Vedis and others are foreseen) 
+								LuaNoSQL defines a simple object-oriented API.
+								All drivers should implement this common API, but each one is free to offer extensions.
+							</p>
+							<p>LuaNoSQL defines one single global variable, a table called <code>luanosql</code>. This table is used to store the initialization methods of loaded drivers.
+							These methods are used to create an <a href="#environment_object">environment object</a> which is used to create a
+							<a href="#connection_object">connection object</a>.
+							A connection object can create a <a href="#cursor_object">cursor object</a> create a which can be used to retrieve, store and seek data.
+							</p>
+						<div> <!-- Introduction -->
+						
+						<div name="compiling">
+						<h2>Compiling</h2>
+						<p>LuaNoSQL is distributed as a set of C source files:
+						a pair of common source and header files (<code>luanosql.h</code> and <code>luanosql.c</code>);
+						and one source file for each driver.
+						Each driver should be compiled with the luanosql.c file to generate a library.
+						This library can be linked to the application or dynamically loaded. 
+						The initialization function is <code>luaopen_luanosql<em>_drivername</em></code> and it is a Lua
+						<a href="http://www.lua.org/manual/5.1/manual.html#pdf-require"><code>open-library</code></a> compatible function.						
+						</p>
+						<p>Check in <i>Makefile</i> that installation folder is correct for your Linux or OSX system. To install LuaNoSQL:
+							<ul>
+								<li>Go to LuaNoSQL folder and type: <pre>make lib</pre></li>
+								<li>Then, to install it, type: <pre>make install</pre></li>
+							</ul>
+						</p>
+
+						<div> <!-- compiling -->
+						
+						<div name="installation">
+						<h2>Installation</h2>
+						<p>LuaNoSQL drivers follow the package model of Lua 5.2. All drivers should be "installed" in your <code>package.cpath</code> into a
+						folder called <code>luanosql</code>.</p>
+						<div> <!-- installation -->
+						
+						<div name="error_handling">
+						<h2>Error Handling</h2>
+						<p>
+						LuaNoSQL is just an abstraction layer that communicates between Lua
+						and a database system.
+						Therefore errors can occur on both levels, that is, inside the database client or inside LuaNoSQL driver.
+						</p>
+						<p>
+						Errors, unknown table names etc. are called <em>database errors</em> and
+						will be reported by the function/method returning <code>nil</code> followed
+						by the error message provided by the database system.
+						Errors such as wrong parameters, absent connection, invalid objects etc., called <em>API errors</em>,
+						are usually program errors and so will raise a Lua error.
+						</p>
+						<p>
+						This behavior will be followed by all functions/methods described in this document unless otherwise stated.
+						</p>
+
+						<div> <!-- error_handling -->
+						
+						<div name="drivers">
+						<h2>Drivers</h2>
+						<p>Drivers (like environments and cursors) in LuaNoSQL have the same concept of LuaSQL ones. Using a simple <code>require</code>
+						it returns a table of the corresponding driver. </p>
+						<p>
+						Example:
+						<pre>local unqlite_driver = require "luanosql.unqlite"       
+local vedis_driver = require "luanosql.vedis" -- Not yet supported</pre>
+						</p>
+						<div> <!-- drivers -->
+						
+						<div name="environment_object">
+						<h2>Environment</h2>
+						<p> Environments are created calling a driver function for initialization which returns an 
+						environment object.
+						</p>
+						<p>
+						Example:
+						<pre>local unqlite_driver = require "luanosql.unqlite"       
+local env = driver.unqlite()
+						</pre>
+						</p>
+						<h3>Methods</h3>
+						<p><code>env:close()</code></br>
+						Closes the environment <code>env</code>. </br>
+						Returns <strong>true</strong> if success, 
+						<strong>false</strong> if already closed.  
+						</p>
+						<p><code>env:connect(db)</code></br>
+						Create a connection with specified DB name.</br> 
+						Returns a <a href="#connection_object">connection object</a>.  
+						</p>
+						<div> <!-- environment -->
+						
+						<div name="connection_object">
+						<h2>Connection</h2>
+						<p>
+						A connection object holds data of a single db connection. 
+						A connection is created by calling the <a href="#environment_object">environment:connect</a> method.
+						</p>
+						<h3>Methods</h3>
+						<p><code>conn:commit()</code></br>
+						This function commits changes to the database.</br>
+						<i>NOTE: normally (on UnQLite) changes are automatically committed when database connection is closed.</i>
+						Returns <strong>true</strong> if success, nil and err otherwise. 
+						</p>
+						<p><code>conn:rollback()</code></br>
+						Rollback a DB transaction.</br>
+						Returns <strong>true</strong> if success, nil and err otherwise.
+						</p>
+						<p><code>conn:kvstore(key,data)</code></br>
+						Store a key and value data into DB.</br>
+						Returns <strong>true</strong> if success, nil and err otherwise.
+						</p>
+						<p><code>conn:kvappend(key,data)</code></br>
+						Append data to a given record (key).</br>
+						Returns <strong>true</strong> if success, nil and err otherwise.
+						</p>
+						<p><code>conn:kvfetch(key)</code></br>
+						Retrieve data from a given record (key).</br>
+						Returns <strong>true</strong> and <strong>data</strong> if success and key is found.</br>
+						Returns <strong>true</strong> and <strong>nil</strong> if key is not found.</br>
+						Returns <strong>nil</strong> and <strong>err</strong> in case of failure.
+						</p>
+						<p><code>conn:delete(key)</code></br>
+						Delete a record passing the key.</br>
+						Returns <strong>true</strong> if success.</br>
+						Returns nil and err in case of failure.
+						</p>
+						<p><code>conn:kvfetch_callback(key,func,ud)</code></br>
+						Set for a given key a callback data consumer function with custom userdata.</br>
+						Returns nil.
+						<p><code>conn:create_cursor()</code></br>
+						Create a new cursor if supported (supported by UnQLite, not in Vedis).</br>
+						Returns a <a href="#cursor_object">cursor object</a>
+						<div> <!-- connection -->
+						
+						
+						<div name="unqlite_extensions">
+						<h2>UnQLite</h2>
+						<p>
+						UnQlite DBMS offers some extensions which are not supported in other DBMS. Cursor objects are an example (see below).
+						A cursor in UnQLite is created by calling the <a href="#environment_object">conn:create_cursor</a> method.
+						</p>
+						<div name="cursor_object">
+						<h3>Cursor Methods</h3>						
+						<p><code>cur:release()</code></br>
+						Release a cursor and destroy its data</br>
+						Returns <strong>true</strong> if success</br>
+						</p>
+						<p><code>cur:seek(key,[search_method])</code></br>
+						Cursor seek for a given key passing the "search_method"</br>
+						<strong>search_method</strong> can be:
+						<ul>
+							<li>UNQLITE_CURSOR_MATCH_EXACT = 0 (default)</li>
+							<li>UNQLITE_CURSOR_MATCH_LE = 1</li>
+							<li>UNQLITE_CURSOR_MATCH_GE = 2</li>
+						</ul>
+						See also <a href="http://unqlite.org/c_api/unqlite_kv_cursor.html">UnQLite doc</a>.
+						If <strong>search_method</strong> is ommitted or set to <strong>nil</strong> the default
+						cursor match methos is used (UNQLITE_CURSOR_MATCH_EXACT).</br>
+						Returns <strong>true</strong> if success and key is found.</br>
+						Returns <strong>false</strong> if key is not found.</br>
+						Returns nil and err in case of failure.
+						</p>
+						<p><code>cur:first_entry()</code></br>
+						Move the cursor to first entry</br>
+						Returns <strong>true</strong> if success</br>
+						Returns nil and err in case of failure.
+						</p>
+						<p><code>cur:last_entry()</code></br>
+						Move the cursor to last entry</br>
+						Returns <strong>true</strong> if success</br>
+						Returns nil and err in case of failure.
+						</p>
+						<p><code>cur:is_valid_entry()</code></br>
+						Check if cursor is valid</br>
+						Returns <strong>true</strong> if success</br>
+						Returns false in case of failure.
+						</p>
+						<p><code>cur:prev_entry()</code></br>
+						Move the cursor to previous entry</br>
+						Returns <strong>true</strong> if success</br>
+						Returns nil and err in case of failure.
+						</p>
+						<p><code>cur:next_entry()</code></br>
+						Move the cursor to next entry</br>
+						Returns <strong>true</strong> if success</br>
+						Returns nil and err in case of failure.
+						</p>
+						<p><code>cur:delete_entry()</code></br>
+						Delete a record using the cursor</br>
+						Returns <strong>true</strong> if success</br>
+						Returns nil and err in case of failure.
+						</p>
+						<p><code>cur:cursor_key()</code></br>
+						Retrieve key using a cursor</br>
+						Returns <strong>key</strong> if success.</br>
+						Returns nil and err in case of failure.
+						</p>
+						<p><code>cur:cursor_data()</code></br>
+						Retrieve data using a cursor</br>
+						Returns <strong>data</strong> if success.</br>
+						Returns nil and err in case of failure.
+						</p>
+						<p><code>cur:cursor_key_callback()</code></br>
+						<strong>Not supported in LuaNoSQL v1.0</strong> </br>
+						</p>
+						<p><code>cur:cursor_data_callback()</code></br>
+						<strong>Not supported LuaNoSQL v1.0</strong> </br>
+						</p>
+						
+						<div> <!-- cursors -->
+						
+						
+						<div> <!-- unqlite -->
+						
+						<div name="vedis_extensions">
+						<h2>Vedis (Not Available yet)</h2>
+						<div> <!-- vedis -->
+					</div>
+				</div>
+			</main>
+			
+			<nav id="nav">
+				<div class="innertube">
+					<h3>Home</h3>
+					<ul>
+						<li><a href="index.html#overview">Overview</a></li>
+						<li><a href="index.html#status">Status</a></li>
+						<li><a href="index.html#download">Download</a></li>
+						<li><a href="index.html#credits">Credits</a></li>
+					</ul>
+					<h3>Documentation</h3>
+					<ul>
+						<li><a href="manual.html#introduction">Introduction</a></li>
+						<li><a href="manual.html#compiling">Compiling</a></li>
+						<li><a href="manual.html#installation">Installation</a></li>
+						<li><a href="manual.html#errors">Error handling</a></li>
+						<li><a href="manual.html#drivers">Drivers</a></li>
+						<li><a href="manual.html#environment_object">Environment</a></li>
+						<li><a href="manual.html#connection_object">Connection</a></li>
+						<li><a href="manual.html#unqlite_extensions">UnQLite</a></li>
+						<li><a href="manual.html#vedis_extensions">Vedis (N.A.)</a></li>
+					</ul>
+					<h3>Other Info</h3>
+					<ul>
+						<li><a href="examples.html#examples">Examples</a></li>
+						<li><a href="examples.html#versions">Versions</a></li>
+						<li><a href="license.html#license">License</a></li>
+					</ul>
+				</div>
+			</nav>
+			
+		</div>
+	</body>
+</html>
+
